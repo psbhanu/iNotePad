@@ -1,0 +1,40 @@
+<% include partials/header.html %>
+    <div class="container" ng-controller="iNotesCtrl">
+		<div class="col-md-8">
+			<!-- <form class="form-notepad"> -->
+				<h2 class="form-notepad-heading"><i class="fa fa-file-text"></i> iNotePad</h2>
+				<input type="hidden" id="noteKey" ng-model="noteKey" class="form-control" >
+				<input type="hidden" id="noteId" ng-model="noteId" class="form-control" >
+				<div class="form-group">
+					<textarea id="noteContent" ng-model="noteContent" rows="20" class="form-control" placeholder="Note contents will goes here!" autofocus></textarea>
+				</div>
+				<div class="form-group">
+					<label for="noteTitle" class="sr-only">Note Title</label>
+					<input type="text" id="noteTitle" ng-model="noteTitle" class="form-control" placeholder="Note Title" required>
+				</div>
+				<div class="form-group pull-right">
+					<button class="btn btn-success" type="button" ng-click="save()"><i class="fa fa-icon-save"></i> Save</button>
+					<button class="btn btn-danger" type="button" ng-click="cancel()">Cancel</button>
+				</div>
+				<div class="clearfix"></div>
+			<!-- </form> -->
+		</div>
+		<div class="col-md-4">
+			<h2 class="form-notepad-heading"><i class="fa fa-save"></i> Saved iNotes</h2>
+			<ul class="saved-file-list well">
+				<li class="saved-file" ng-repeat="(key, note) in notes">
+					<a href="javascript:void(0);" ng-click="edit(key)">{{ key + 1 }}. <i class="fa fa-file-text"></i> {{ note.title }}</a> 
+					<div class="action-buttons pull-right">
+						<button class="btn btn-primary btn-xs" ng-click="edit(key)"> <i class="fa fa-pencil"></i> </button>
+						<button class="btn btn-danger btn-xs" ng-click="delete(key)"> <i class="fa fa-remove"></i> </button>
+						<button class="btn btn-success btn-xs" ng-click="download(key)"> <i class="fa fa-download"></i> </button>
+					</div>
+					<div class="clearfix"></div>
+				</li>
+				<li class="saved-file" ng-if="notes.length === 0">
+					<span class="btn btn-primary btn-block btn-md xactive"><i class="fa fa-warning"></i> You do not have any saved Note yet!</span>
+				</li>				
+			</ul>
+		</div>
+    </div> <!-- /container -->
+<% include partials/footer.html %>
