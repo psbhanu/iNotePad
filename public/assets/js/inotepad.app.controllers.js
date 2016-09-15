@@ -1,4 +1,4 @@
-iNotePad.controller('iNotesCtrl', ['$scope', 'NOTES', 'NoteFactory', function($scope, NOTES, NoteFactory){
+iNotePad.controller('iNotesCtrl', ['$scope', '$cookies', 'NOTES', 'NoteFactory', 'MessageFactory', function($scope, $cookies, NOTES, NoteFactory, MessageFactory){
 	// Initialize Note Components
 	$scope.noteKey 		= 0;
 	$scope.noteId 		= 0;
@@ -10,6 +10,25 @@ iNotePad.controller('iNotesCtrl', ['$scope', 'NOTES', 'NoteFactory', function($s
 	//NOTES.push(new NoteFactory.Note("Text Content Note 2", "Title of Note 2"));
 	//NOTES.push(new NoteFactory.Note("Text Content Note 3", "Title of Note 3"));
 	
+	// Cookies Support Methods
+	$scope.getCookies = function(){
+		return $cookies.getObject('iNotes');
+	};	
+	$scope.getCookie = function(key){
+		return $cookies.getObject(key);
+	};
+	$scope.updateCookies = function(){
+		return $cookies.putObject('iNotes', { NOTES : NOTES });
+	};
+	$scope.removeCookies = function(){
+		return $cookies.remove('NOTES');
+	};
+
+	// Retrieving Notes 
+	var iNotes = $scope.getCookies();
+	if(iNotes) {
+		NOTES = iNotes.NOTES;
+	} 
 	$scope.notes = NOTES;
 	
 	// Save/Update Note
@@ -18,8 +37,6 @@ iNotePad.controller('iNotesCtrl', ['$scope', 'NOTES', 'NoteFactory', function($s
 		var noteId 		= $scope.noteId;
 		var noteTitle 	= $scope.noteTitle;
 		var noteContent = $scope.noteContent;
-		
-		console.log(noteKey);
 		
 		if(noteContent) {
 			if( noteId == 0 ) {
@@ -32,15 +49,48 @@ iNotePad.controller('iNotesCtrl', ['$scope', 'NOTES', 'NoteFactory', function($s
 				// Push Anyways
 				NOTES.push(new NoteFactory.Note(noteContent, noteTitle));				
 			}
+
+			// Validating Size
+			if(noteContent.length > 4096) { 
+				MessageFactory.warning(); 
+			} else {
+				MessageFactory.success(); 
+			}
+			
 			$scope.clear();
 		} else {
 			angular.element('#noteContent').focus();
 		}
+		$scope.updateCookies();
 	};	
 
+	// Clone Note
+	$scope.clone = function(){
+		var noteId 		= $scope.noteId;
+		var noteTitle 	= $scope.noteTitle;
+		var noteContent = $scope.noteContent;
+		
+		if(noteContent) {
+			// Create New Note
+			NOTES.push(new NoteFactory.Note(noteContent, noteTitle));
+			
+			// Validating Size
+			if(noteContent.length > 4096) { 
+				MessageFactory.warning(); 
+			} else {
+				MessageFactory.success(); 
+			}
+
+			$scope.clear();
+		} else {
+			angular.element('#noteContent').focus();
+		}
+		$scope.updateCookies();
+	};		
+	
 	$scope.cancel = function(){ 
 		$scope.clear();	
-	};
+	};	
 	
 	$scope.clear = function(){ 
 		$scope.noteKey		= "";
@@ -64,6 +114,7 @@ iNotePad.controller('iNotesCtrl', ['$scope', 'NOTES', 'NoteFactory', function($s
 		if( key > -1 ) {
 			NOTES.splice(key, 1);
 		}
+		$scope.updateCookies();
 	};
 
 	// Download Note
